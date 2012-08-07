@@ -1,8 +1,8 @@
+# Maintainer: Egon Geerardyn <egon <dot> geerardyn <at> gmail <dot> com>
 # Contributor: Martin Stolpe <martinstolpe <at> googlemail dot com>
-
 #you need to have at least alsa, oss or jack to be installed on the system
 pkgname=bpmdj
-pkgver=4.1
+pkgver=4.2_pl3
 pkgrel=1
 pkgdesc="Tool for detecting the BPM of mp3, ogg, m4a, mpc and flac files"
 arch=('i686' 'x86_64')
@@ -12,36 +12,25 @@ depends=('fftw' 'openssl' 'qt')
 makedepends=('cmake' 'gcc')
 optdepends=('alsa-lib: for ALSA playback'
   'jack-audio-connection-kit: for JACK playback')
-# options=()
-source=(ftp://bpmdj.yellowcouch.org/bpmdj/$pkgname-$pkgver.source.tgz
-  CMakeLists.txt.tar.gz
-  patch2.diff
+source=(ftp://bpmdj.yellowcouch.org/bpmdj/$pkgname-v${pkgver//_/-}.tar.bz2
+defines.arch
 )
 
-noextract=(CMakeLists.txt.tar.gz)
 
 build() {
   cd "$srcdir"
+  cp defines.arch $srcdir/defines
+#  [ -d "${srcdir}/build" ] && rm -rf "${srcdir}/build"
   
-  tar -xzf CMakeLists.txt.tar.gz -C "$srcdir/$pkgname-$pkgver"
+#  rm "${srcdir}/version.h"
+#  rm "${srcdir}/data-syntax.cpp"
+#  rm "${srcdir}/data-lexer.cpp"
 
-  cd "$srcdir/$pkgname-$pkgver"
-
-  patch -Np0 -i ../patch2.diff
-
-  [ -d "${srcdir}/${pkgname}-${pkgver}/build" ] && rm -rf "${srcdir}/${pkgname}-${pkgver}/build"
-  
-  rm "${srcdir}/${pkgname}-${pkgver}/version.h"
-  rm "${srcdir}/${pkgname}-${pkgver}/data-syntax.cpp"
-  rm "${srcdir}/${pkgname}-${pkgver}/data-lexer.cpp"
-
-  mkdir -p "${srcdir}/${pkgname}-${pkgver}/build" || return 1
-  cd "${srcdir}/${pkgname}-${pkgver}/build"
-  cmake ../ -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release
-  make || return 1
+#  mkdir -p "${srcdir}/build" || return 1
+#  cd "${srcdir}/build"
+#  cmake ../ -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release
+  make
 
   make DESTDIR="$pkgdir/" install
 }
-md5sums=('ff4795bfe1eac829a7fcf88b496311df'
-         '62ae4f1a33d1d7a26b9825fa203c484e'
-         '069f49ebfbd0cad116661fd9aa85975b')
+#md5sums=('e2590f2c6b2bd6074438faab9ca547e1')
