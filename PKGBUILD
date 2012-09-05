@@ -1,36 +1,65 @@
-# Maintainer: Egon Geerardyn <egon <dot> geerardyn <at> gmail <dot> com>
 # Contributor: Martin Stolpe <martinstolpe <at> googlemail dot com>
-#you need to have at least alsa, oss or jack to be installed on the system
+# Contributor: rtfreedman  (rob<d0t>til<d0t>freedman<aT>googlemail<d0t>com
+
 pkgname=bpmdj
-pkgver=4.2_pl3
+pkgver=v4.2_pl3
 pkgrel=1
-pkgdesc="Tool for detecting the BPM of mp3, ogg, m4a, mpc and flac files"
+pkgdesc="Free Dj tools with a fully automatic BPM counter"
 arch=('i686' 'x86_64')
 url="http://bpmdj.yellowcouch.org/index.html"
 license=('GPL')
-depends=('fftw' 'openssl' 'qt')
-makedepends=('cmake' 'gcc')
+depends=('fftw' 'qt')
 optdepends=('alsa-lib: for ALSA playback'
   'jack-audio-connection-kit: for JACK playback')
-source=(ftp://bpmdj.yellowcouch.org/bpmdj/$pkgname-v${pkgver//_/-}.tar.bz2
-defines.arch
-)
 
+source=("ftp://bpmdj.yellowcouch.org/bpmdj/bpmdj-${pkgver//_/-}.tar.bz2"
+		"bpmdj-pl3.patch")
+		
+options=(!makeflags !buildflags)
+noextract=(bpmdj-${pkgver//_/-}.tar.bz2)
 
 build() {
   cd "$srcdir"
-  cp defines.arch $srcdir/defines
-#  [ -d "${srcdir}/build" ] && rm -rf "${srcdir}/build"
+  mkdir "$pkgname-$pkgver"
+  tar -xf bpmdj-${pkgver//_/-}.tar.bz2 -C "$pkgname-$pkgver"
+
+  cd "$pkgname-$pkgver"
+  patch -Np1 -i ../bpmdj-pl3.patch
   
-#  rm "${srcdir}/version.h"
-#  rm "${srcdir}/data-syntax.cpp"
-#  rm "${srcdir}/data-lexer.cpp"
-
-#  mkdir -p "${srcdir}/build" || return 1
-#  cd "${srcdir}/build"
-#  cmake ../ -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release
+if [ "$CARCH" = "i686" ]; then
+  cat defines.archlinux >defines
+elif [ "$CARCH" = "x86_64" ]; then
+  cat defines.archlinux64 >defines
+fi
   make
-
-  make DESTDIR="$pkgdir/" install
 }
-#md5sums=('e2590f2c6b2bd6074438faab9ca547e1')
+
+package() {
+	cd "$srcdir/$pkgname-$pkgver"
+	mkdir -p "${pkgdir}"/usr/bin
+#  idx2txt
+	cp bpmdj bpmplay bpmmerge bpmcount bpmdjraw "${pkgdir}"/usr/bin
+# docs
+	mkdir -p "${pkgdir}"/usr/share/doc/$pkgname
+	cp authors.txt  changelog.txt readme.txt support.txt \
+		"${pkgdir}"/usr/share/doc/$pkgname
+}
+
+#[Desktop Entry]
+#Name=BpmDJ - Free Dj Tools
+#Comment=Free Dj tools with a fully automatic BPM counter
+#Type=Application
+#Exec=bpmdj
+#Icon=bpmdj
+#Encoding=UTF-8
+#Categories=AudioVideo;Player;
+
+#bpmdj-v4.2_pl3/bpmdj-12.png
+#bpmdj-v4.2_pl3/bpmdj-24.png
+#bpmdj-v4.2_pl3/bpmdj-36.png
+#bpmdj-v4.2_pl3/bpmdj-48.png
+#bpmdj-v4.2_pl3/bpmdj-64.png
+#bpmdj-v4.2_pl3/bpmdj-96.png
+
+md5sums=('e2590f2c6b2bd6074438faab9ca547e1'
+         '4c1e2f0344ace7fcc9068b15390c0b25')
