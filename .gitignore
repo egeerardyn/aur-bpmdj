@@ -3,3 +3,4 @@ pkg/
 *.sublime-workspace
 bpmdj*.tar.bz2
 *.log
+.directory
