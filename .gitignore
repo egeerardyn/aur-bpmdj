@@ -4,3 +4,6 @@ pkg/
 bpmdj*.tar.bz2
 *.log
 .directory
+*.src.tar.gz
+*.pkg.tar.gz
+*.pkg.tar.xz
